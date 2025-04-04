@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  isOwner,
-} from "@eveworld/utils";
+import { isOwner } from "@eveworld/utils";
 import {
   useSmartObject,
   useNotification,
@@ -18,7 +16,6 @@ import {
   InventoryView,
 } from "@eveworld/ui-components";
 import { abbreviateAddress } from "@eveworld/utils";
-import { defaultDescriptions } from "@eveworld/utils/consts";
 
 import EquippedModules from "./Modules";
 import SmartAssemblyActions from "./SmartAssemblyActions";
@@ -26,11 +23,15 @@ import SmartGateImage from "../assets/smart-gate.png";
 import SmartStorageUnitImage from "../assets/smart-storage-unit.png";
 import SmartTurretImage from "../assets/smart-turret.png";
 import { useMUD } from "../MUDContext";
-import {ethers} from "ethers";
+import { ethers } from "ethers";
+import PackageForm from "./PackageForm";
+import { convertToPackageAbi } from "./utils";
+import PackageList from "./PackageList";
 
 const EntityView = React.memo((): JSX.Element => {
   const { defaultNetwork, gatewayConfig, walletClient } = useConnection();
   const { smartAssembly, smartCharacter, loading } = useSmartObject();
+
   const { notify, handleClose } = useNotification();
   const { systemCalls } = useMUD();
 
@@ -73,23 +74,18 @@ const EntityView = React.memo((): JSX.Element => {
     SmartGate: SmartGateImage,
   };
 
-  const handlePing = async () => {
-    await systemCalls.ping("hello");
-  };
   const handleDeposit = async () => {
-    if (ephemeralInventoryItemIds.length==0){
+    if (ephemeralInventoryItemIds.length == 0) {
       notify({ type: Severity.Error, message: "No items to deposit" });
     } else {
       notify({ type: Severity.Info, message: "Depositing inventory items..." });
-      await systemCalls.deposit(
+      await systemCalls.depositAll(
         BigInt(smartAssembly.id),
-         ephemeralInventoryItemIds
-       );
-       handleClose();
-     };
+        ephemeralInventoryItemIds
+      );
+      handleClose();
     }
-      
-
+  };
 
   return (
     <EveLoadingAnimation position="diagonal">
@@ -113,18 +109,8 @@ const EntityView = React.memo((): JSX.Element => {
             id="smartassembly-image"
           />
           <SmartAssemblyActions />
-
-          <div className="Quantum-Container Title">Description</div>
-          <div
-            className="Quantum-Container font-normal text-xs !py-4"
-            id="smartassembly-description"
-          >
-            {smartAssembly.description
-              ? smartAssembly.description
-              : defaultDescriptions[smartAssembly.assemblyType]}
-          </div>
         </div>
-
+        <PackageList />
         <div className="grid grid-cols-2 mobile:grid-cols-1 bg-crude">
           <div>
             {isEntityOwner ? (
@@ -135,21 +121,22 @@ const EntityView = React.memo((): JSX.Element => {
                 gatewayConfig={gatewayConfig}
               />
             ) : (
-              <InventoryView
-                smartAssembly={
-                  smartAssembly as SmartAssemblyType<"SmartStorageUnit">
-                }
-                walletClient={walletClient!}
-              />
+              <>
+                <PackageForm
+                  pack={convertToPackageAbi(
+                    playerInventory?.ephemeralInventoryItems || []
+                  )}
+                />
+                <InventoryView
+                  smartAssembly={
+                    smartAssembly as SmartAssemblyType<"SmartStorageUnit">
+                  }
+                  walletClient={walletClient!}
+                />
+              </>
             )}
             {isEntityOwner ? (
-              <>
-                <div className="Quantum-Container">
-                  <EveButton typeClass="primary" onClick={handlePing}>
-                    ping
-                  </EveButton>
-                </div>
-              </>
+              <></>
             ) : (
               <>
                 <div className="Quantum-Container">

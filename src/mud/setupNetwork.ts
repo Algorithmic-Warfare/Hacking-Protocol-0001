@@ -21,8 +21,9 @@ import {
   getContract,
   Chain,
 } from "viem";
-import mudConfig from "../../../builder-examples/tribe-smart-storage-unit/packages/contracts/mud.config";
-import ITribeStorageSystemAbi from "../../../builder-examples/tribe-smart-storage-unit/packages/contracts/out/ITribeStorageSystem.sol/ITribeStorageSystem.abi.json";
+import mudConfig from "../../../TribeDispenser/packages/contracts/mud.config";
+import ITribeStorageSystemAbi from "../../../TribeDispenser/packages/contracts/out/ITribeStorageSystem.sol/ITribeStorageSystem.abi.json";
+import ITribeDispenserSystemAbi from "../../../TribeDispenser/packages/contracts/out/ITribeDispenserSystem.sol/ITribeDispenserSystem.abi.json";
 
 import { getNetworkConfig } from "./getNetworkConfig";
 
@@ -50,7 +51,10 @@ export async function setupNetwork(
 }> {
   const networkConfig = await getNetworkConfig(__chainId, __worldAddress);
 
-  const mergedAbi = mergeAbis([ITribeStorageSystemAbi]);
+  const mergedAbi = mergeAbis([
+    ITribeStorageSystemAbi,
+    ITribeDispenserSystemAbi,
+  ]);
 
   const fallbackTransport = fallback([webSocket(), http()]);
   const clientOptions = {
@@ -62,6 +66,7 @@ export async function setupNetwork(
 
   const publicClient = createPublicClient(clientOptions);
 
+  console.log(publicClient);
   const write$ = new Subject<ContractWrite>();
 
   const worldContract = getContract({

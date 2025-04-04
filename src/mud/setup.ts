@@ -35,6 +35,8 @@ export async function setup(
   // const components = createClientComponents(network);
   const systemCalls = createSystemCalls(network);
 
+  console.log(systemCalls);
+
   return {
     network,
     // components,

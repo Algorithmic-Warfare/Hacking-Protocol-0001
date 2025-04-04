@@ -9,6 +9,7 @@ import { ErrorNotice, ErrorNoticeTypes } from "@eveworld/ui-components";
 import EntityView from "./components/EntityView";
 
 import App from "./App";
+import MUDSyncStatus from "./components/MUDSyncStatus";
 
 const darkTheme = createTheme({
   palette: {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
         path: "*",
         element: <EntityView />,
       },
+      {
+        path: "blocks",
+        element: <MUDSyncStatus />,
+      },
     ],
   },
 ]);
@@ -63,5 +68,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </ThemeProvider>
     </EveWorldProvider>
     ,
-  </ErrorBoundary>,
+  </ErrorBoundary>
 );

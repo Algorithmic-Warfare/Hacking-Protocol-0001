@@ -1,19 +1,16 @@
 import React, { useState } from "react";
-import { Severity, SmartAssemblyType, type InventoryItem } from "@eveworld/types";
 import {
-  formatM3,
-  isOwner,
-} from "@eveworld/utils";
-import {
-  EveLinearBar,
-  EveScroll,
-  EveButton,
-  EveInput
-} from "@eveworld/ui-components";
+  Severity,
+  SmartAssemblyType,
+  type InventoryItem,
+} from "@eveworld/types";
+import { formatM3, isOwner } from "@eveworld/utils";
+import { EveLinearBar, EveButton, EveInput } from "@eveworld/ui-components";
 import { useNotification } from "@eveworld/contexts";
 import { WalletClient } from "viem";
 import { useMUD } from "../MUDContext";
-import {ethers} from "ethers";
+import { ethers } from "ethers";
+import { EveNumericalInput, EveScrollBar } from "./elements";
 
 const ModifiedInventoryView = React.memo(
   ({
@@ -69,24 +66,29 @@ const ModifiedInventoryView = React.memo(
       inventoryItemId: bigint,
       inventoryItemAmount: bigint
     ) => {
-
-    if (ethers.getNumber(inventoryItemAmount)==0){
-      notify({ type: Severity.Error, message: "No item selected to withdraw" });
-    } else {
-      notify({ type: Severity.Info, message: "Withdrawing inventory items..." });
-      await systemCalls.withdraw(
-        BigInt(smartAssembly.id),
-        inventoryItemId,
-        inventoryItemAmount
-      );
-       handleClose();
-     };
+      if (ethers.getNumber(inventoryItemAmount) == 0) {
+        notify({
+          type: Severity.Error,
+          message: "No item selected to withdraw",
+        });
+      } else {
+        notify({
+          type: Severity.Info,
+          message: "Withdrawing inventory items...",
+        });
+        await systemCalls.withdraw(
+          BigInt(smartAssembly.id),
+          inventoryItemId,
+          inventoryItemAmount
+        );
+        handleClose();
+      }
     };
 
     return (
       <>
         <div className="Quantum-Container Title">{"Storage Inventory"}</div>
-        <EveScroll maxHeight="260px" id="smartassembly-inventory">
+        <EveScrollBar maxHeight="260px" id="smartassembly-inventory">
           <div className="Quantum-Container text-xs flex flex-col !py-4 gap-2 min-h-full">
             {!inventoryItems || inventoryItems.length === 0 ? (
               <div>Empty</div>
@@ -102,7 +104,7 @@ const ModifiedInventoryView = React.memo(
               ))
             )}
           </div>
-        </EveScroll>
+        </EveScrollBar>
 
         <div className="Quantum-Container Title">Inventory Capacity</div>
         <div
@@ -151,11 +153,9 @@ const InventoryItem = ({
         <></>
       ) : (
         <>
-          <EveInput
-            inputType="numerical"
+          <EveNumericalInput
             fieldName="Quantity"
             defaultValue={selectedQuantity}
-            placeholder={`${selectedQuantity}`}
             onChange={(value) => {
               if (Number(value) <= quantity) {
                 setSelectedQuantity(Number(value));
@@ -164,7 +164,7 @@ const InventoryItem = ({
               }
             }}
           />
-          <EveButton typeClass="primary" onClick={handleWithdraw}>
+          <EveButton typeClass="tertiary" onClick={handleWithdraw}>
             withdraw
           </EveButton>
         </>

@@ -11,10 +11,15 @@
 
  */
 
-import { MUDChain, garnet, mudFoundry } from "@latticexyz/common/chains";
+import {
+  MUDChain,
+  garnet,
+  mudFoundry,
+  pyrope,
+} from "@latticexyz/common/chains";
 
 /*
  * See https://mud.dev/tutorials/minimal/deploy#run-the-user-interface
  * for instructions on how to add networks.
  */
-export const supportedChains: MUDChain[] = [mudFoundry, garnet];
+export const supportedChains: MUDChain[] = [mudFoundry, pyrope];

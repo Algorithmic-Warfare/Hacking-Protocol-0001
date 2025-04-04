@@ -3,7 +3,9 @@
  * for changes in the World state (using the System contracts).
  */
 
+import { Hex } from "viem";
 import { SetupNetworkResult } from "./setupNetwork";
+import type { PackageAbi } from "./types.ts";
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
@@ -21,16 +23,86 @@ export function createSystemCalls(
    *   - useStore
    *   - tables
    */
-  { worldContract }: SetupNetworkResult
+  { worldContract, useStore, tables }: SetupNetworkResult
 ) {
-  const deposit = async (
+  /*
+   * The system calls are functions that will be used to
+   * call the System contracts.
+   *
+   * They are not called directly, but rather through the
+   * useSystemCalls hook (see useSystemCalls.ts).
+   *
+   * The system calls are defined as async functions that
+   * return a promise.
+   *
+   * The promise resolves when the transaction is confirmed.
+   */
+
+  const getAllPackages = () => {
+    const allPackages = Object.values(
+      useStore.getState().getRecords(tables.TribePackage)
+    );
+
+    return allPackages;
+  };
+
+  const registerPackage = async (
+    smartStorageUnitId: bigint,
+    packageName: string,
+    pack: PackageAbi
+  ) => {
+    //@ts-ignore
+    await worldContract.write.AWAR__registerPackage([
+      smartStorageUnitId,
+      packageName,
+      [pack],
+    ]);
+  };
+
+  const unregisterPackage = async (packageId: bigint) => {
+    //@ts-ignore
+    await worldContract.write.AWAR__unregisterPackage([packageId]);
+  };
+
+  const renamePackage = async (packageId: bigint, newName: string) => {
+    //@ts-ignore
+    await worldContract.write.AWAR__renamePackage([packageId, newName]);
+  };
+
+  const dispensePackageMaterials = async (
+    smartStorageUnitId: bigint,
+    packageId: bigint,
+    quantity: bigint
+  ) => {
+    //@ts-ignore
+    await worldContract.write.AWAR__dispensePackageMaterials([
+      smartStorageUnitId,
+      packageId,
+      quantity,
+    ]);
+  };
+
+  const depositAll = async (
     smartStorageUnitId: bigint,
     ephemeralInventoryItemIds: bigint[]
   ) => {
     //@ts-ignore
-    await worldContract.write.AWAR__deposit([
+    await worldContract.write.AWAR__depositAll([
       smartStorageUnitId,
       ephemeralInventoryItemIds,
+    ]);
+  };
+
+  const deposit = async (
+    smartStorageUnitId: bigint,
+    ephemeralInventoryItemId: bigint,
+    ephemeralInventoryItemAmount: bigint
+  ) => {
+    //@ts-ignore
+    await worldContract.write.AWAR__deposit([
+      smartStorageUnitId,
+      ephemeralInventoryItemId,
+      ephemeralInventoryItemAmount,
     ]);
   };
 
@@ -39,9 +111,6 @@ export function createSystemCalls(
     inventoryItemId: bigint,
     inventoryItemAmount: bigint
   ) => {
-    console.log(smartStorageUnitId);
-    console.log(inventoryItemId);
-    console.log(inventoryItemAmount);
     //@ts-ignore
     await worldContract.write.AWAR__withdraw([
       smartStorageUnitId,
@@ -50,13 +119,14 @@ export function createSystemCalls(
     ]);
   };
 
-  const ping = async (pingText: string) => {
-    //@ts-ignore
-    await worldContract.write.AWAR__ping([pingText]);
-  };
   return {
-    deposit,
     withdraw,
-    ping,
+    deposit,
+    depositAll,
+    registerPackage,
+    renamePackage,
+    unregisterPackage,
+    dispensePackageMaterials,
+    getAllPackages,
   };
 }

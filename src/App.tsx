@@ -21,6 +21,7 @@ import {
   EveAlert,
 } from "@eveworld/ui-components";
 import MUDProvider from "./MUDContext";
+import MUDSyncProvider from "./MUDSyncContext";
 
 const App = () => {
   const [networkMUDConfig, setNetworkMUDConfig] = useState<Awaited<
@@ -85,26 +86,34 @@ const App = () => {
         isStyled={false}
       />
 
-      <MUDProvider value={networkMUDConfig}>
-        <EveLayout
-          isCurrentChain={isCurrentChain}
-          connected={connectedProvider.connected}
-          handleDisconnect={handleDisconnect}
-          walletClient={walletClient}
-          smartCharacter={smartCharacter}
-        >
-          {isCurrentChain ? (
-            <Outlet />
-          ) : (
-            <ErrorNotice
-              loading={loading}
-              smartAssembly={smartAssembly}
-              type={ErrorNoticeTypes.MESSAGE}
-              errorMessage={`Switch network to ${walletClient.chain?.name} to continue`}
-            />
-          )}
-        </EveLayout>
-      </MUDProvider>
+      <>
+        {!networkMUDConfig || !walletClient ? (
+          <div>Not configured.</div>
+        ) : (
+          <MUDProvider value={networkMUDConfig}>
+            <MUDSyncProvider>
+              <EveLayout
+                isCurrentChain={isCurrentChain}
+                connected={connectedProvider.connected}
+                handleDisconnect={handleDisconnect}
+                walletClient={walletClient}
+                smartCharacter={smartCharacter}
+              >
+                {isCurrentChain ? (
+                  <Outlet />
+                ) : (
+                  <ErrorNotice
+                    loading={loading}
+                    smartAssembly={smartAssembly}
+                    type={ErrorNoticeTypes.MESSAGE}
+                    errorMessage={`Switch network to ${walletClient.chain?.name} to continue`}
+                  />
+                )}
+              </EveLayout>
+            </MUDSyncProvider>
+          </MUDProvider>
+        )}
+      </>
       <GenerateEveFeralCodeGen style="bottom-12 text-xs -z-10" />
     </>
   );
