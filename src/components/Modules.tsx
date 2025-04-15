@@ -97,6 +97,7 @@ const EquippedModules = React.memo((): JSX.Element => {
               smartAssembly as SmartAssemblyType<"SmartStorageUnit">
             }
             walletClient={walletClient}
+            isEphemeralInventory={false}
           />
         );
       case "SmartGate":

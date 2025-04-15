@@ -81,7 +81,7 @@ export async function getNetworkConfig(
     params.get("worldAddress") ||
     world?.address ||
     import.meta.env.VITE_WORLD_ADDRESS ||
-    "0x9891ee4bf5f2a9e74e9d81b06b855eec70b78d4f";
+    "0x90373cf89e73168cdf90e99d0a7fa9c4b5625c6a";
   if (!worldAddress) {
     throw new Error(
       `No world address found for chain ${chainId}. Did you run \`mud deploy\`?`

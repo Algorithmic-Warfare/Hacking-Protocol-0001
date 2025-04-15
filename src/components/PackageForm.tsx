@@ -53,7 +53,9 @@ const PackageForm: React.FC<PackageFormProps> = ({ pack }) => {
   };
   return (
     <>
-      <div className="Quantum-Container Title">Register Package</div>
+      <div className="Quantum-Container Title">
+        <span className={"text-xl"}> Register Package</span>
+      </div>
       <div
         className="Quantum-Container font-normal text-xs !py-4"
         id="smartassembly-description"

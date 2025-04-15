@@ -5,7 +5,6 @@ import React, {
   ReactNode,
   HTMLAttributes,
 } from "react";
-import "@eveworld/ui-components/styles-ui.css";
 
 interface FakeScrollbarProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
@@ -22,63 +21,70 @@ const EveScrollBar: React.FC<FakeScrollbarProps> = ({
   const { id } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollTopRatioRef = useRef<number>(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const [scrollVisible, setScrollVisible] = useState(false);
   const [scrollHeight, setScrollHeight] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0);
 
   useEffect(() => {
-    const updateScrollState = () => {
-      if (containerRef.current && contentRef.current) {
-        const containerHeight = containerRef.current.clientHeight;
-        const contentHeight = contentRef.current.scrollHeight;
+    if (containerRef.current && contentRef.current) {
+      const containerHeight = containerRef.current.clientHeight;
+      const contentHeight = contentRef.current.scrollHeight;
 
-        setScrollVisible(contentHeight > containerHeight);
-        setScrollHeight((containerHeight / contentHeight) * containerHeight);
-      }
-    };
-
-    updateScrollState();
-
-    // Add a resize listener to handle container size changes
-    window.addEventListener("resize", updateScrollState);
-    return () => window.removeEventListener("resize", updateScrollState);
+      setScrollVisible(contentHeight > containerHeight);
+      setScrollHeight((containerHeight / contentHeight) * containerHeight);
+    }
   }, [children]);
 
   const handleScroll = () => {
+    console.log("handleScroll");
+
     if (containerRef.current && contentRef.current) {
       const containerHeight = containerRef.current.clientHeight;
       const contentHeight = contentRef.current.scrollHeight;
 
       const scrollTop = containerRef.current.scrollTop;
-      setScrollTop(scrollTop / (contentHeight - containerHeight)); // Ratio of scroll position
+      const scrollTopRatio = scrollTop / contentHeight;
+      const newScrollTop = scrollTopRatio * containerHeight;
+
+      contentRef.current.scrollTop = newScrollTop;
+      scrollTopRatioRef.current = scrollTopRatio;
+
+      console.log(scrollTopRatioRef.current);
+      console.log(newScrollTop);
     }
   };
 
   const handleContentScroll = () => {
+    console.log("handleContentScroll");
     if (containerRef.current && contentRef.current) {
       const contentHeight = contentRef.current.scrollHeight;
 
       const scrollTop = contentRef.current.scrollTop;
-      setScrollTop(scrollTop / contentHeight);
-      containerRef.current.scrollTop = scrollTop;
+      const scrollTopRatio = scrollTop / contentHeight;
+
+      // Synchronize scroll position between the custom scrollbar and the actual scroll position of the content.
+      scrollTopRatioRef.current = scrollTopRatio;
+      console.log(scrollTopRatioRef.current);
     }
   };
 
-  const contentWidth = scrollVisible ? `calc(100% - 0.5rem)` : `100%`;
+  const contentWidth = scrollVisible ? "w-[calc(100%-0.5rem)]" : "w-full";
 
   return (
     <div
       className="Eve-Scroll-Container"
       ref={containerRef}
       style={{ maxHeight }}
-      onScroll={handleScroll} // Only handle scroll on the container
+      onScroll={handleScroll}
       id={id}
     >
       <div
-        className={`Eve-Scroll-Content ${classStyles || ""}`}
+        className={`Eve-Scroll-Content ${contentWidth} ${
+          classStyles ? classStyles : ""
+        }`}
         ref={contentRef}
-        style={{ width: contentWidth }}
+        onScroll={handleContentScroll}
       >
         {children}
       </div>
@@ -88,7 +94,7 @@ const EveScrollBar: React.FC<FakeScrollbarProps> = ({
             className="Eve-Scroll-Thumb"
             style={{
               height: `${scrollHeight}px`,
-              top: `${scrollTop * (containerRef.current!.clientHeight - scrollHeight)}px`,
+              top: `${scrollTopRatioRef.current * 100}%`,
             }}
           ></div>
         </div>

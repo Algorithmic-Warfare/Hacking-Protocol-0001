@@ -16,9 +16,11 @@ const ModifiedInventoryView = React.memo(
   ({
     smartAssembly,
     walletClient,
+    isEphemeralInventory,
   }: {
     smartAssembly: SmartAssemblyType<"SmartStorageUnit">;
     walletClient: WalletClient;
+    isEphemeralInventory: boolean;
   }): JSX.Element => {
     if (!smartAssembly) return <></>;
     const {
@@ -35,6 +37,12 @@ const ModifiedInventoryView = React.memo(
     const { notify, handleClose } = useNotification();
     const { systemCalls } = useMUD();
 
+    const [searchString, setSearchString] = useState<string>("");
+
+    const handleSearch = (str: string) => {
+      setSearchString(str);
+    };
+
     const playerInventory = ephemeralInventoryList.find((x) => {
       return (
         ethers.getAddress(x.ownerId) ==
@@ -44,23 +52,44 @@ const ModifiedInventoryView = React.memo(
 
     // If owner, return persistent storage items
     // If player, return own ephemeral storage items
-    const inventoryItems = storageItems?.map((item: any) => {
-      return item;
-    });
 
-    const ephemeralInventoryItems =
-      playerInventory?.ephemeralInventoryItems?.map((item) => {
-        return item;
-      });
+    const inventoryItems = !isEphemeralInventory
+      ? storageItems?.map((item: any) => {
+          return item;
+        })
+      : playerInventory?.ephemeralInventoryItems?.map((item) => {
+          return item;
+        });
 
-    const ephemeralInventoryItemIds =
-      playerInventory?.ephemeralInventoryItems?.map((item) => {
-        return BigInt(item.itemId);
-      }) || [];
+    const storageCap = !isEphemeralInventory
+      ? storageCapacity
+      : playerInventory?.storageCapacity;
+    const usedCap = !isEphemeralInventory
+      ? usedCapacity
+      : playerInventory?.usedCapacity;
 
-    const storageCap = storageCapacity;
-
-    const usedCap = usedCapacity;
+    const handleDeposit = async (
+      inventoryItemId: bigint,
+      inventoryItemAmount: bigint
+    ) => {
+      if (ethers.getNumber(inventoryItemAmount) == 0) {
+        notify({
+          type: Severity.Error,
+          message: "No item selected to deposit",
+        });
+      } else {
+        notify({
+          type: Severity.Info,
+          message: "Depositing inventory items...",
+        });
+        await systemCalls.deposit(
+          BigInt(smartAssembly.id),
+          inventoryItemId,
+          inventoryItemAmount
+        );
+        handleClose();
+      }
+    };
 
     const handleWithdraw = async (
       inventoryItemId: bigint,
@@ -87,21 +116,44 @@ const ModifiedInventoryView = React.memo(
 
     return (
       <>
-        <div className="Quantum-Container Title">{"Storage Inventory"}</div>
+        <div className="Quantum-Container flex flex-row items-center space-between gap-0">
+          <span className="text-l">
+            {isEphemeralInventory ? "Your Inventory" : "Storage Inventory"}
+          </span>
+          <span className="flex-auto">
+            <EveInput
+              inputType="string"
+              defaultValue={""}
+              placeholder="search"
+              onChange={(str) => handleSearch(String(str || ""))}
+              fieldName="search"
+            />
+          </span>
+        </div>
         <EveScrollBar maxHeight="260px" id="smartassembly-inventory">
           <div className="Quantum-Container text-xs flex flex-col !py-4 gap-2 min-h-full">
             {!inventoryItems || inventoryItems.length === 0 ? (
               <div>Empty</div>
             ) : (
-              inventoryItems?.map((item, index) => (
-                <div key={index}>
-                  <InventoryItem
-                    item={item}
-                    isEntityOwner={isEntityOwner}
-                    withdrawAction={handleWithdraw}
-                  />
-                </div>
-              ))
+              inventoryItems
+                ?.filter((item) =>
+                  //@ts-ignore
+                  String(item.name)
+                    .toLowerCase()
+                    .includes(searchString.toLowerCase())
+                )
+                .map((item, index) => (
+                  <div key={index}>
+                    <InventoryItem
+                      item={item}
+                      isEntityOwner={isEntityOwner}
+                      actionName={isEphemeralInventory ? "Deposit" : "Withdraw"}
+                      actionHandler={
+                        isEphemeralInventory ? handleDeposit : handleWithdraw
+                      }
+                    />
+                  </div>
+                ))
             )}
           </div>
         </EveScrollBar>
@@ -125,21 +177,23 @@ const ModifiedInventoryView = React.memo(
 const InventoryItem = ({
   isEntityOwner,
   item,
-  withdrawAction,
+  actionName,
+  actionHandler,
 }: {
   isEntityOwner: boolean;
   item: InventoryItem;
-  withdrawAction: (
+  actionName: string;
+  actionHandler: (
     inventoryItemId: bigint,
     inventoryItemAmount: bigint
-  ) => void;
+  ) => Promise<void>;
 }) => {
   const { typeId, name, quantity, itemId } = item;
 
   const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
 
-  const handleWithdraw = () => {
-    return withdrawAction(BigInt(itemId), BigInt(selectedQuantity));
+  const handleAction = () => {
+    return actionHandler(BigInt(itemId), BigInt(selectedQuantity));
   };
 
   return (
@@ -164,8 +218,8 @@ const InventoryItem = ({
               }
             }}
           />
-          <EveButton typeClass="tertiary" onClick={handleWithdraw}>
-            withdraw
+          <EveButton typeClass="tertiary" onClick={handleAction}>
+            {actionName}
           </EveButton>
         </>
       )}

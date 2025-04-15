@@ -23,3 +23,15 @@ body,
     @apply col-span-full;
   }
 }
+
+::-webkit-scrollbar {
+  background: transparent;
+  border: 1px solid hsla(26, 85%, 58%, 1);
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(26, 85%, 58%, 1);
+  padding: 1px;
+  scrollbar-width: thin;
+}

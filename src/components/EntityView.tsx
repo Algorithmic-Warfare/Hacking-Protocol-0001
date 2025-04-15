@@ -27,6 +27,7 @@ import { ethers } from "ethers";
 import PackageForm from "./PackageForm";
 import { convertToPackageAbi } from "./utils";
 import PackageList from "./PackageList";
+import ModifiedInventoryView from "./ModifiedInventoryView";
 
 const EntityView = React.memo((): JSX.Element => {
   const { defaultNetwork, gatewayConfig, walletClient } = useConnection();
@@ -111,6 +112,11 @@ const EntityView = React.memo((): JSX.Element => {
           <SmartAssemblyActions />
         </div>
         <PackageList />
+        <PackageForm
+          pack={convertToPackageAbi(
+            playerInventory?.ephemeralInventoryItems || []
+          )}
+        />
         <div className="grid grid-cols-2 mobile:grid-cols-1 bg-crude">
           <div>
             {isEntityOwner ? (
@@ -122,16 +128,12 @@ const EntityView = React.memo((): JSX.Element => {
               />
             ) : (
               <>
-                <PackageForm
-                  pack={convertToPackageAbi(
-                    playerInventory?.ephemeralInventoryItems || []
-                  )}
-                />
-                <InventoryView
+                <ModifiedInventoryView
                   smartAssembly={
                     smartAssembly as SmartAssemblyType<"SmartStorageUnit">
                   }
                   walletClient={walletClient!}
+                  isEphemeralInventory={true}
                 />
               </>
             )}

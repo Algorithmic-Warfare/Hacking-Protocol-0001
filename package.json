@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "firebase:publish": "firebase deploy --only hosting",
     "dev": "vite",
     "build": "tsc && vite build",
     "ci:build": "tsc && BUILD_ENV=test node ../../../scripts/required-env.js && vite build --outDir ../../../build_outputs/smart-assembly-base/dist",
@@ -17,6 +18,7 @@
     "test:e2e": "synpress run --config supportFile='tests/support/index.ts',baseUrl=http://localhost:4173"
   },
   "dependencies": {
+    "@base-ui-components/react": "1.0.0-alpha.7",
     "@base_ui/react": "1.0.0-alpha.3",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
