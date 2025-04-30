@@ -28,6 +28,7 @@ import PackageForm from "./PackageForm";
 import { convertToPackageAbi } from "./utils";
 import ModifiedInventoryView from "./ModifiedInventoryView";
 import ModifiedAssemblyActions from "./ModifiedAssemblyActions";
+import ProveButton from "../zupass/ProveButton";
 
 const EntityView = React.memo((): JSX.Element => {
   const { defaultNetwork, gatewayConfig, walletClient } = useConnection();
@@ -98,6 +99,8 @@ const EntityView = React.memo((): JSX.Element => {
           <div className="bg-brightquantum text-crude flex items-stretch justify-between px-2 py-1 font-semibold">
             <span className="uppercase">{smartAssembly?.name}</span>
             <span className="flex flex-row items-center">
+              <ProveButton />
+              &nbsp;
               {abbreviateAddress(smartAssembly?.id)}
               <ClickToCopy
                 text={smartAssembly?.id}

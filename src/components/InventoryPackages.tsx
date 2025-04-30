@@ -14,11 +14,13 @@ import React from "react";
 import { EveScrollBar } from "./elements";
 import { abbreviateAddress } from "@eveworld/utils";
 import PackageEntry from "./PackageEntry";
+import ProveButton from "../zupass/ProveButton";
+import { useZupassContext } from "../zupass/ZupassContext";
 
 const InventoryLogs = () => {
   const { systemCalls } = useMUD();
   const { syncedAtLeastOnce, live } = useMUDSync();
-
+  const { proved } = useZupassContext();
   const { smartAssembly, smartCharacter, loading } = useSmartObject();
   const [isLoading, setIsLoading] = useState(true);
   const [searchString, setSearchString] = useState<string>("");
@@ -74,6 +76,8 @@ const InventoryLogs = () => {
         <div className="bg-brightquantum text-crude flex items-stretch justify-between px-2 py-1 font-semibold">
           <span className="uppercase">{smartAssembly?.name}</span>
           <span className="flex flex-row items-center">
+            <ProveButton />
+            &nbsp;
             {abbreviateAddress(smartAssembly?.id)}
             <ClickToCopy text={smartAssembly?.id} className="text-crude" />{" "}
           </span>
@@ -117,6 +121,7 @@ const InventoryLogs = () => {
                       author={toHex(author)}
                       entries={entries}
                       key={BigInt(id)}
+                      disabled={!proved}
                     />
                   );
                 })}

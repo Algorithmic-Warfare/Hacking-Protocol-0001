@@ -11,6 +11,7 @@ interface PackageEntryProps {
   name: string;
   author: Hex;
   entries: bigint[];
+  disabled?: boolean;
 }
 
 const PackageEntry: React.FC<PackageEntryProps> = ({
@@ -18,6 +19,7 @@ const PackageEntry: React.FC<PackageEntryProps> = ({
   name,
   author,
   entries,
+  disabled,
 }) => {
   const { notify, handleClose } = useNotification();
   const { systemCalls } = useMUD();
@@ -68,7 +70,7 @@ const PackageEntry: React.FC<PackageEntryProps> = ({
             typeClass="primary"
             onClick={handleDispense}
             className="primary-sm mb-2"
-            disabled={false}
+            disabled={disabled}
             id="dispense-package"
           >
             Dispense
