@@ -17,15 +17,14 @@ export type TransactionPodEntries = {
 };
 
 export interface PodVaultClient {
-  store: (podJson: string) => Promise<void>;
+  store: (pod: POD) => Promise<void>;
   prove: (proofRequestJson: string) => Promise<unknown>;
   remove: (signature: string) => Promise<void>;
   issueTransactionPod: (transaction: TransactionPodEntries) => Promise<POD>;
 }
 
 export function createPodVaultClient(api: ParcnetAPI): PodVaultClient {
-  const store = async (podJson: string) => {
-    const pod = POD.fromJSON(JSON.parse(podJson));
+  const store = async (pod: POD) => {
     await api.pod.collection(zAppConfig.collection).insert({
       entries: pod.content.asEntries(),
       signature: pod.signature,
@@ -62,7 +61,7 @@ export function createPodVaultClient(api: ParcnetAPI): PodVaultClient {
       ssuId: { type: "string", value: transaction.ssuId.toString() },
       timestamp: {
         type: "date",
-        value: new Date(Number(transaction.timestamp)),
+        value: new Date(Number(transaction.timestamp) * 1000),
       },
     };
     const signedPod = await api.pod.sign(podData);

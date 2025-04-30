@@ -13,6 +13,8 @@ import { toHex } from "viem";
 import React from "react";
 import { EveScrollBar } from "./elements";
 import { abbreviateAddress } from "@eveworld/utils";
+import { expectedItemId } from "../zupass/config";
+import { SaveTransactionButton } from "../zupass/SaveTransactionButton";
 
 const InventoryLogs = () => {
   const { systemCalls } = useMUD();
@@ -65,6 +67,18 @@ const InventoryLogs = () => {
           }
           return true;
         })
+        .filter((transaction) => {
+          //@ts-ignore
+          const inventoryItemId = transaction.value?.inventoryItemId;
+          return (
+            inventoryItemId === expectedItemId && true
+            // smartCharacterAddress === transaction.value?.tribesmenAddress
+          );
+        })
+        .sort(
+          (a: any, b: any) =>
+            Number(b.value?.timestamp) - Number(a.value?.timestamp)
+        )
     );
   }, [live, loading, searchString]);
 
@@ -109,66 +123,71 @@ const InventoryLogs = () => {
         ) : (
           <EveScrollBar maxHeight="520px" id="smartassembly-inventory">
             <div className="Quantum-Container font-normal text-xs !py-4">
-              {storageTransactions
-                .sort(
-                  (a, b) =>
-                    Number(b.value?.timestamp) - Number(a.value?.timestamp)
-                )
-                .map((transaction, index) => {
-                  const address = transaction.value?.tribesmenAddress;
-                  const inventoryItemId = transaction.value?.inventoryItemId;
-                  const inventoryItemAmount =
-                    transaction.value?.inventoryItemAmount;
-                  const timestamp = transaction.value?.timestamp;
-                  const transactionType = transaction.value?.transactionType;
+              {storageTransactions.map((transaction, index) => {
+                const address = transaction.value?.tribesmenAddress;
+                const inventoryItemId = transaction.value?.inventoryItemId;
+                const inventoryItemAmount =
+                  transaction.value?.inventoryItemAmount;
+                const timestamp = transaction.value?.timestamp;
+                const transactionType = transaction.value?.transactionType;
 
-                  const transactionTypeLabel =
-                    transactionType === 0 ? "DEPOSIT" : "WITHDRAWAL";
+                const transactionTypeLabel =
+                  transactionType === 0 ? "DEPOSIT" : "WITHDRAWAL";
 
-                  return (
-                    <div
-                      key={index}
-                      className="border-b border-brightquantum py-2 px-4 flex flex-col gap-2 overflow-auto"
-                    >
-                      <div className="flex justify-between overflow-hidden">
-                        <span className="font-semibold">Transaction Type:</span>
-                        <span className="text-brightquantum truncate">
-                          {transactionTypeLabel}
-                        </span>
-                      </div>
-                      <div className="flex justify-between overflow-hidden">
-                        <span className="font-semibold">Address:</span>
-                        <span className="truncate">{String(address)}</span>
-                        <ClickToCopy
-                          text={String(address)}
-                          className="text-brightquantum"
-                        />
-                      </div>
-                      <div className="flex justify-between overflow-hidden">
-                        <span className="font-semibold">
-                          Inventory Item ID:
-                        </span>
-                        <span className="truncate">
-                          {String(inventoryItemId)}
-                        </span>
-                        <ClickToCopy
-                          text={String(inventoryItemId)}
-                          className="text-brighquantum"
-                        />
-                      </div>
-                      <div className="flex justify-between overflow-hidden">
-                        <span className="font-semibold">Amount:</span>
-                        <span className="truncate">
-                          {String(inventoryItemAmount)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between overflow-hidden">
-                        <span className="font-semibold">Timestamp:</span>
-                        <span className="truncate">{timestamp.toString()}</span>
-                      </div>
+                return (
+                  <div
+                    key={index}
+                    className="border-b border-brightquantum py-2 px-4 flex flex-col gap-2 overflow-auto"
+                  >
+                    <div className="flex justify-between overflow-hidden">
+                      <span className="font-semibold">Transaction Type:</span>
+                      <span className="text-brightquantum truncate">
+                        {transactionTypeLabel}
+                      </span>
                     </div>
-                  );
-                })}
+                    <div className="flex justify-between overflow-hidden">
+                      <span className="font-semibold">Address:</span>
+                      <span className="truncate">{String(address)}</span>
+                      <ClickToCopy
+                        text={String(address)}
+                        className="text-brightquantum"
+                      />
+                    </div>
+                    <div className="flex justify-between overflow-hidden">
+                      <span className="font-semibold">Inventory Item ID:</span>
+                      <span className="truncate">
+                        {String(inventoryItemId)}
+                      </span>
+                      <ClickToCopy
+                        text={String(inventoryItemId)}
+                        className="text-brighquantum"
+                      />
+                    </div>
+                    <div className="flex justify-between overflow-hidden">
+                      <span className="font-semibold">Amount:</span>
+                      <span className="truncate">
+                        {String(inventoryItemAmount)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between overflow-hidden">
+                      <span className="font-semibold">Timestamp:</span>
+                      <span className="truncate">{timestamp.toString()}</span>
+                    </div>
+                    <div className="flex justify-end overflow-hidden">
+                      <SaveTransactionButton
+                        transaction={{
+                          tribesmenAddress: address,
+                          inventoryItemId,
+                          inventoryItemAmount,
+                          timestamp,
+                          transactionType,
+                          ssuId: BigInt(smartAssemblyId || "0"),
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </EveScrollBar>
         )}

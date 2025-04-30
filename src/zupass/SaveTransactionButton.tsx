@@ -17,6 +17,7 @@ export const SaveTransactionButton: FC<SaveTransactionButtonProps> = ({
   transaction,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
   const { podVault } = useZupassContext();
 
   const handleSaveTransaction = async () => {
@@ -31,7 +32,8 @@ export const SaveTransactionButton: FC<SaveTransactionButtonProps> = ({
         timestamp: BigInt(transaction.timestamp),
         ssuId: transaction.ssuId,
       });
-      console.log(pod);
+      await client.store(pod);
+      setSaved(true);
     } catch (error) {
       console.error("Failed to save transaction:", error);
     } finally {
@@ -43,9 +45,9 @@ export const SaveTransactionButton: FC<SaveTransactionButtonProps> = ({
     <EveButton
       typeClass="primary"
       onClick={handleSaveTransaction}
-      disabled={loading}
+      disabled={loading || saved}
     >
-      {loading ? "Wait..." : "Save proof"}
+      {loading ? "Wait..." : saved ? "Saved" : "Save proof"}
     </EveButton>
   );
 };

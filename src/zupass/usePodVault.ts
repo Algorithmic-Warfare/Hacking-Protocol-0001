@@ -47,11 +47,11 @@ export function usePodVault(): PodVault {
   }, [client]);
 
   const store = useCallback(
-    async (podJson: string) => {
+    async (pod: POD) => {
       if (!client) {
         throw new Error("Zapp not connected");
       }
-      return client.store(podJson);
+      return client.store(pod);
     },
     [client]
   );
