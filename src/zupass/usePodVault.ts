@@ -3,7 +3,11 @@ import { connect as connectZapp, ParcnetAPI } from "@parcnet-js/app-connector";
 import * as p from "@parcnet-js/podspec";
 import { zAppConfig } from "./config";
 import { POD, PODEntries } from "@pcd/pod";
-import { PodVaultClient, TransactionPodEntries, createPodVaultClient } from "./podVaultClient";
+import {
+  PodVaultClient,
+  TransactionPodEntries,
+  createPodVaultClient,
+} from "./podVaultClient";
 
 export type PodVaultStatus = "offline" | "connecting" | "connected";
 
@@ -57,11 +61,11 @@ export function usePodVault(): PodVault {
   );
 
   const prove = useCallback(
-    async (proofRequestJson: string) => {
+    async (request: p.PodspecProofRequest) => {
       if (!client) {
         throw new Error("Zapp not connected");
       }
-      return client.prove(proofRequestJson);
+      return client.prove(request);
     },
     [client]
   );

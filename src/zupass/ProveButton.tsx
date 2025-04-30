@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { EveButton } from "@eveworld/ui-components";
 import { useZupassContext } from "./ZupassContext";
 
@@ -8,12 +8,15 @@ interface ProveButtonProps {
 }
 
 const ProveButton: React.FC<ProveButtonProps> = ({ className }) => {
-  const { podVault, proved } = useZupassContext();
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const { proved, prove } = useZupassContext();
 
   const handleClick = async () => {
-    if (podVault.status === "offline") {
-      await podVault.connect();
-    }
+    setLoading(true);
+    const r = await prove();
+    setLoading(false);
+    setFailed(!r);
   };
 
   if (proved) return null;
@@ -23,8 +26,9 @@ const ProveButton: React.FC<ProveButtonProps> = ({ className }) => {
       typeClass="secondary"
       onClick={handleClick}
       className={className}
+      disabled={loading}
     >
-      Prove
+      {loading ? "Wait..." : failed ? "Failed" : "Prove"}
     </EveButton>
   );
 };

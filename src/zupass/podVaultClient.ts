@@ -1,10 +1,11 @@
 import { ParcnetAPI } from "@parcnet-js/app-connector";
 import { POD, PODEntries } from "@pcd/pod";
 import { zAppConfig } from "./config";
+import * as p from "@parcnet-js/podspec";
 
 export enum TransactionType {
-  Withdraw = 0,
-  Deposit = 1,
+  Deposit = 0,
+  Withdraw = 1,
 }
 
 export type TransactionPodEntries = {
@@ -18,7 +19,7 @@ export type TransactionPodEntries = {
 
 export interface PodVaultClient {
   store: (pod: POD) => Promise<void>;
-  prove: (proofRequestJson: string) => Promise<unknown>;
+  prove: (request: p.PodspecProofRequest) => Promise<boolean>;
   remove: (signature: string) => Promise<void>;
   issueTransactionPod: (transaction: TransactionPodEntries) => Promise<POD>;
 }
@@ -32,9 +33,9 @@ export function createPodVaultClient(api: ParcnetAPI): PodVaultClient {
     });
   };
 
-  const prove = async (proofRequestJson: string) => {
-    const proofRequest = JSON.parse(proofRequestJson);
-    return await api.gpc.prove({ request: proofRequest });
+  const prove = async (request: p.PodspecProofRequest) => {
+    const r = await api.gpc.prove({ request });
+    return r.success;
   };
 
   const remove = async (signature: string) => {

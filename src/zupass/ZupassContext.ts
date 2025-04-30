@@ -4,6 +4,7 @@ import { usePodVault } from "./usePodVault";
 interface ZupassContextProps {
   podVault: ReturnType<typeof usePodVault>;
   proved: boolean;
+  prove: () => Promise<boolean>;
 }
 
 export const ZupassContext = createContext<ZupassContextProps | undefined>(

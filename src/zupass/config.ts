@@ -22,5 +22,6 @@ function createZappConfig(appName: string, collection: string): ZappConfig {
   };
 }
 
-export const expectedItemId = 101566323435732540889167848324699621054641644394678449818508966615754276560108n; // Silicates
-const expectedItemAmount = 1000n; // 1000
+export const expectedItemId =
+  101566323435732540889167848324699621054641644394678449818508966615754276560108n; // Silicates
+export const expectedItemQuantity = 1000n; // 1000

@@ -11,6 +11,7 @@ import { WalletClient } from "viem";
 import { useMUD } from "../MUDContext";
 import { ethers } from "ethers";
 import { EveNumericalInput, EveScrollBar } from "./elements";
+import { useZupassContext } from "../zupass/ZupassContext";
 
 const ModifiedInventoryView = React.memo(
   ({
@@ -114,6 +115,8 @@ const ModifiedInventoryView = React.memo(
       }
     };
 
+    const { proved } = useZupassContext();
+
     return (
       <>
         <div className="Quantum-Container flex flex-row items-center space-between gap-0">
@@ -151,6 +154,7 @@ const ModifiedInventoryView = React.memo(
                       actionHandler={
                         isEphemeralInventory ? handleDeposit : handleWithdraw
                       }
+                      disabled={!isEphemeralInventory && !proved}
                     />
                   </div>
                 ))
@@ -179,6 +183,7 @@ const InventoryItem = ({
   item,
   actionName,
   actionHandler,
+  disabled,
 }: {
   isEntityOwner: boolean;
   item: InventoryItem;
@@ -187,6 +192,7 @@ const InventoryItem = ({
     inventoryItemId: bigint,
     inventoryItemAmount: bigint
   ) => Promise<void>;
+  disabled?: boolean;
 }) => {
   const { typeId, name, quantity, itemId } = item;
 
@@ -218,7 +224,11 @@ const InventoryItem = ({
               }
             }}
           />
-          <EveButton typeClass="tertiary" onClick={handleAction}>
+          <EveButton
+            typeClass="tertiary"
+            onClick={handleAction}
+            disabled={disabled}
+          >
             {actionName}
           </EveButton>
         </>
