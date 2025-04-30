@@ -50,6 +50,9 @@ const PackageForm: React.FC<PackageFormProps> = ({ pack }) => {
       pack
     );
     handleClose();
+
+    // Redirect to home page
+    window.location.href = `/inventory-packages?smartObjectId=${smartAssembly.id}`;
   };
   return (
     <>
@@ -63,10 +66,10 @@ const PackageForm: React.FC<PackageFormProps> = ({ pack }) => {
         <div className="flex flex-row gap-2">
           <EveInput
             inputType="string"
-            defaultValue={"[Recipe] ..."}
             placeholder="Type Package Name"
             onChange={(str) => handleEdit(String(str || ""))}
             fieldName="Package Name"
+            defaultValue={""}
           />
           <EveButton
             typeClass="secondary"

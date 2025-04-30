@@ -46,6 +46,13 @@ export function createSystemCalls(
     return allPackages;
   };
 
+  const getAllStorageTransactions = () => {
+    const allTransactions = Object.values(
+      useStore.getState().getRecords(tables.TribeStorageTransaction)
+    );
+    return allTransactions;
+  };
+
   const registerPackage = async (
     smartStorageUnitId: bigint,
     packageName: string,
@@ -128,5 +135,6 @@ export function createSystemCalls(
     unregisterPackage,
     dispensePackageMaterials,
     getAllPackages,
+    getAllStorageTransactions,
   };
 }

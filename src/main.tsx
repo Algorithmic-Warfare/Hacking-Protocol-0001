@@ -10,6 +10,9 @@ import EntityView from "./components/EntityView";
 
 import App from "./App";
 import MUDSyncStatus from "./components/MUDSyncStatus";
+import InventoryLogs from "./components/InventoryLogs";
+import InventoryPackages from "./components/InventoryPackages";
+import PackageCreator from "./components/PackageCreator";
 
 const darkTheme = createTheme({
   palette: {
@@ -44,6 +47,18 @@ const router = createBrowserRouter([
       {
         path: "*",
         element: <EntityView />,
+      },
+      {
+        path: "inventory-logs",
+        element: <InventoryLogs />,
+      },
+      {
+        path: "inventory-packages",
+        element: <InventoryPackages />,
+      },
+      {
+        path: "package-creator",
+        element: <PackageCreator />,
       },
       {
         path: "blocks",

@@ -30,8 +30,8 @@ const PackageEntry: React.FC<PackageEntryProps> = ({
 
     notify({
       type: Severity.Info,
-      message: "Dispensing package materials ..."
-    })
+      message: "Dispensing package materials ...",
+    });
     await systemCalls.dispensePackageMaterials(
       BigInt(smartAssemblyId),
       id,
@@ -43,8 +43,8 @@ const PackageEntry: React.FC<PackageEntryProps> = ({
   const handleUnregister = async () => {
     notify({
       type: Severity.Info,
-      message: "Unregistering package..."
-    })
+      message: "Unregistering package...",
+    });
     await systemCalls.unregisterPackage(id);
     handleClose();
   };
@@ -60,7 +60,7 @@ const PackageEntry: React.FC<PackageEntryProps> = ({
             onChange={(value) => {
               setSelectedQuantity(Number(value));
             }}
-            vertical={true}
+            vertical={false}
           />
         </div>
         <div className="text-xs mb-2 flex flex-row">

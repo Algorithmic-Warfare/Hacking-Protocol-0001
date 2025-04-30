@@ -26,8 +26,8 @@ import { useMUD } from "../MUDContext";
 import { ethers } from "ethers";
 import PackageForm from "./PackageForm";
 import { convertToPackageAbi } from "./utils";
-import PackageList from "./PackageList";
 import ModifiedInventoryView from "./ModifiedInventoryView";
+import ModifiedAssemblyActions from "./ModifiedAssemblyActions";
 
 const EntityView = React.memo((): JSX.Element => {
   const { defaultNetwork, gatewayConfig, walletClient } = useConnection();
@@ -109,14 +109,8 @@ const EntityView = React.memo((): JSX.Element => {
             src={defaultImages[smartAssembly.assemblyType]}
             id="smartassembly-image"
           />
-          <SmartAssemblyActions />
+          <ModifiedAssemblyActions />
         </div>
-        <PackageList />
-        <PackageForm
-          pack={convertToPackageAbi(
-            playerInventory?.ephemeralInventoryItems || []
-          )}
-        />
         <div className="grid grid-cols-2 mobile:grid-cols-1 bg-crude">
           <div>
             {isEntityOwner ? (
