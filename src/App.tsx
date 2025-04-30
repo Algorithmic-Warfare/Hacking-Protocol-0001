@@ -22,6 +22,7 @@ import {
 } from "@eveworld/ui-components";
 import MUDProvider from "./MUDContext";
 import MUDSyncProvider from "./MUDSyncContext";
+import { ZupassContextProvider } from "./zupass/ZupassContextProvider";
 
 const App = () => {
   const [networkMUDConfig, setNetworkMUDConfig] = useState<Awaited<
@@ -90,28 +91,30 @@ const App = () => {
         {!networkMUDConfig || !walletClient ? (
           <div>Not configured.</div>
         ) : (
-          <MUDProvider value={networkMUDConfig}>
-            <MUDSyncProvider>
-              <EveLayout
-                isCurrentChain={isCurrentChain}
-                connected={connectedProvider.connected}
-                handleDisconnect={handleDisconnect}
-                walletClient={walletClient}
-                smartCharacter={smartCharacter}
-              >
-                {isCurrentChain ? (
-                  <Outlet />
-                ) : (
-                  <ErrorNotice
-                    loading={loading}
-                    smartAssembly={smartAssembly}
-                    type={ErrorNoticeTypes.MESSAGE}
-                    errorMessage={`Switch network to ${walletClient.chain?.name} to continue`}
-                  />
-                )}
-              </EveLayout>
-            </MUDSyncProvider>
-          </MUDProvider>
+          <ZupassContextProvider>
+            <MUDProvider value={networkMUDConfig}>
+              <MUDSyncProvider>
+                <EveLayout
+                  isCurrentChain={isCurrentChain}
+                  connected={connectedProvider.connected}
+                  handleDisconnect={handleDisconnect}
+                  walletClient={walletClient}
+                  smartCharacter={smartCharacter}
+                >
+                  {isCurrentChain ? (
+                    <Outlet />
+                  ) : (
+                    <ErrorNotice
+                      loading={loading}
+                      smartAssembly={smartAssembly}
+                      type={ErrorNoticeTypes.MESSAGE}
+                      errorMessage={`Switch network to ${walletClient.chain?.name} to continue`}
+                    />
+                  )}
+                </EveLayout>
+              </MUDSyncProvider>
+            </MUDProvider>
+          </ZupassContextProvider>
         )}
       </>
       <GenerateEveFeralCodeGen style="bottom-12 text-xs -z-10" />
